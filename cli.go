@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -28,7 +29,7 @@ func (cli *CLI) getBalance(address string) {
 		balance += out.Value
 	}
 
-	fmt.Printf("Balance of '%s': %d\n", address, balance)
+	fmt.Printf("Balance of '%s': %d DohCoins\n", address, balance)
 }
 
 func (cli *CLI) printUsage() {
@@ -73,7 +74,18 @@ func (cli *CLI) send(from, to string, amount int) {
 
 	tx := NewUTXOTransaction(from, to, amount, bc)
 	bc.MineBlock([]*Transaction{tx})
-	fmt.Println("Success!")
+
+    fh, err := os.Open("donut.txt")
+    if err != nil {
+    	log.Panic(err)
+    }
+
+    _, err = io.Copy(os.Stdout, fh)
+    if err != nil {
+    	log.Panic(err)
+    }
+    
+    fmt.Printf("\nSuccess! %s got Doh'd!\n", to)
 }
 
 func (cli *CLI) Run() {
